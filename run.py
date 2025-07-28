@@ -1,5 +1,6 @@
 from pass_generator import *
 from temp_file_manager import *
+from db_connecting import DB
 
 def get_number_by_range(a: int, b: int):
 	while True:
@@ -18,6 +19,8 @@ lower = 0
 upper = 0
 symbl = 0
 pass_session = []
+db = DB()
+db_connected = db.check_is_connected()
 temp_file_name = 'passwords_temporary_file.txt'
 
 print('Do you want to upload your last passwords?\n1. Yes\n0. No')
@@ -26,14 +29,15 @@ if inp:
 	pass_session = read_temp_file(temp_file_name).split()
 
 while(True):
-	print(f"Select your operation:\n1. Num of digits = {digit}\n2. Num of lower cases = {str(lower)}\n3. Num of upper cases = {str(upper)}\n4. Num of symbols = {str(symbl)}\n5. Generate password\n6. Show your passwords\n7. Rejix\n0. Exit")
-	inp = get_number_by_range(0, 7)
+	print(f"Select your operation:\n1. Num of digits = {digit}\n2. Num of lower cases = {str(lower)}\n3. Num of upper cases = {str(upper)}\n4. Num of symbols = {str(symbl)}\n5. Generate password\n6. Show your passwords\n7. Rejix\n8. DB manager\n0. Exit")
+	inp = get_number_by_range(0, 8)
 
 	if inp == 0:
 		print('Do you want to save your passwords?\n1. Yes\n0. No')
 		inp = get_number_by_range(0, 1)
 		if inp:
 			save_to_temp_file(temp_file_name, pass_session)
+		db.close_db()
 		break
 
 	if inp == 5:
@@ -51,6 +55,21 @@ while(True):
 		if len(password) and rigix_check(password, digit, lower, upper, symbl):
 			print('Accept ;)')
 		else: print('Not true.')
+
+	elif inp == 8:
+		if db_connected:
+			print('Select your operation:\n1. Add passwords to DB.\n2. Get passwords from DB.')
+			inp = get_number_by_range(1,2)
+			if inp == 1:
+				db.add_data(pass_session)
+			elif inp == 2:
+				passwords = db.get_data()
+				if passwords:
+					pass_session += passwords
+					print('Passwords add to your session.')
+				else: print('There is no data to get.')
+
+		else: print('Can not connect to DB.')
 
 	else:
 		print('Enter the number:')
