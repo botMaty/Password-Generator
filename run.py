@@ -58,16 +58,19 @@ while(True):
 
 	elif inp == 8:
 		if db_connected:
-			print('Select your operation:\n1. Add passwords to DB.\n2. Get passwords from DB.')
-			inp = get_number_by_range(1,2)
+			print('Select your operation:\n1. Add passwords to username.\n2. Get passwords by username.\n3. Add username')
+			inp = get_number_by_range(1,3)
+			username = input("Enter your username:").strip()
 			if inp == 1:
-				db.add_data(pass_session)
+				db.add_data(username, pass_session)
 			elif inp == 2:
-				passwords = db.get_data()
+				passwords = db.get_data(username)
 				if passwords:
 					pass_session += passwords
-					print('Passwords add to your session.')
+					print('Passwords added to your session.')
 				else: print('There is no data to get.')
+			elif inp == 3:
+				db.add_user(username)
 
 		else: print('Can not connect to DB.')
 
