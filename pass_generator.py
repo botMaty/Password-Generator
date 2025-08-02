@@ -2,6 +2,17 @@ import random
 import string
 
 def password_generator(digit: int, lower: int, upper: int, symbl: int):
+	"""Generate a Password by given arguments.
+
+	Args:
+		digit (int): number of digits
+		lower (int): number of lower cases
+		upper (int): number of upper cases
+		symbl (int): number of symbols
+
+	Returns:
+		str: the generated password.
+	"""	
 	password = ''
 	arr = [0, 1, 2, 3]
 	i, j, k, l = 0, 0, 0, 0
@@ -30,6 +41,18 @@ def password_generator(digit: int, lower: int, upper: int, symbl: int):
 	return password
 
 def rigix_check(password: str, digit: int, lower: int, upper: int, symbl: int):
+	"""Rigix your given password by given arguments.
+
+	Args:
+		password (str): the given password
+		digit (int): number of digits
+		lower (int): number of lower cases
+		upper (int): number of upper cases
+		symbl (int): number of symbols
+
+	Returns:
+		bool: Return **True** if rigix was true else **False**
+	"""	
 	if len(password) != digit + lower + upper + symbl:
 		return False
 
