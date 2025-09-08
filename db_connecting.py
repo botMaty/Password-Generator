@@ -56,7 +56,6 @@ class DB:
 			curs.execute(query, (data, username))
 			self._conn.commit()
 			curs.close()
-			print(f"Data added to {username}.")
 
 
 	def get_data(self, username: str):

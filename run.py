@@ -1,7 +1,6 @@
 from pass_generator import *
 from temp_file_manager import *
 from db_connecting import DB
-import os
 
 digit = 0
 lower = 0
@@ -14,16 +13,24 @@ temp_file_name = 'passwords_temporary_file.txt'
 
 def option_0():
 	global temp_file_name, session
-	print('Do you want to save your passwords?\n1. Yes\n0. No')
+	print("Do you want to save your passwords?")
+	print("1. Yes")
+	print("0. No")
 	inp = get_number_by_range(0, 1)
-	if inp:
+	if inp == 1:
 		save_to_temp_file(temp_file_name, session['pass'])
 	db.close_db()
 
 def option_1():
 	global digit, lower, upper, symbl
 	while True:
-		print(f"Select the characters type you want to change the num of it:\n1. Num of digits = {digit}\n2. Num of lower cases = {str(lower)}\n3. Num of upper cases = {str(upper)}\n4. Num of symbols = {str(symbl)}\n0. Back")
+		print("Select the characters type you want to change the num of it:")
+		print(f"1. Num of digits = {digit}")
+		print(f"2. Num of lower cases = {str(lower)}")
+		print(f"3. Num of upper cases = {str(upper)}")
+		print(f"4. Num of symbols = {str(symbl)}")
+		print("0. Back")
+
 		inp = get_number_by_range(0, 4)
 
 		if inp == 0:
@@ -46,25 +53,34 @@ def option_1():
 def option_2():
 	global session
 	password = password_generator(digit, lower, upper, symbl)
-	if len(password):
+
+	if len(password) and password not in session['pass']:
 		session['pass'].append(password)
+
 	print("Your password: " + password)
-	clear_screen(with_press=True)
+	wait_for_enter()
+	clear_screen()
 
 def option_3():
 	global session
 	for i in range(len(session['pass'])):
 		print(f'{i+1}. {session['pass'][i]}')
-	clear_screen(with_press=True)
+	wait_for_enter()
+	clear_screen()
 
 def option_4():
 	global digit, lower, upper, symbl
-	print(f"Digits = {digit}\nLower cases = {str(lower)}\nUpper cases = {str(upper)}\nSymbols = {str(symbl)}")
+	print(f"Digits = {digit}")
+	print(f"Lower cases = {str(lower)}")
+	print(f"Upper cases = {str(upper)}")
+	print(f"Symbols = {str(symbl)}")
+
 	password = input('Enter your password: ').strip()
 	if len(password) and rigix_check(password, digit, lower, upper, symbl):
 		print('Accept ;)')
 	else: print('Not true.')
-	clear_screen(with_press=True)
+	wait_for_enter()
+	clear_screen()
 
 def option_5():
 	global db, db_connected, temp_file_name, session
@@ -72,11 +88,18 @@ def option_5():
 	if db_connected:
 		while True:
 			if session['user']:
-				print("Select your db operation:\n1. Add your passwords.\n2. Get your passwords.\n3. Logout\n0. Back")
+				print("Select your db operation:")
+				print("1. Add your passwords")
+				print("2. Get your passwords")
+				print("3. Logout")
+				print("0. Back")
+
 				inp = inp = get_number_by_range(0,3)
 				if inp == 0:
 					break
 				
+				clear_screen()
+
 				if inp == 1:
 					db.add_data(session['user'], session['pass'])
 					print("data added to your db.")
@@ -84,17 +107,26 @@ def option_5():
 					passwords = db.get_data(session['user'])
 					if passwords:
 						session['pass'] += passwords
-					print("Data added to you session.")
+					print("Data added to you session")
 				elif inp == 3:
 					session['user'] = None
 					break
 
+				wait_for_enter()
+
 			else:
 
-				print("Login/Register\n1. You already have username\n2. Add your username\n0. Back")
+				print("Login/Register")
+				print("1. You already have username")
+				print("2. Add your username")
+				print("0. Back")
+
 				inp = inp = get_number_by_range(0,2)
 				if inp == 0:
 					break
+
+				clear_screen()
+
 				username = input("Enter your username: ").strip()
 				lr_pass = input("Enter your password: ").strip()
 				lr_check = False
@@ -106,20 +138,35 @@ def option_5():
 				elif inp == 2:
 					lr_check = db.add_user(username, lr_pass)
 					if lr_check:
-						print("Username added.")
+						print("Username added")
 
 				if lr_check:
 					session['user'] = username
 
-			clear_screen(with_press=True)
+				wait_for_enter()
 
-	else: print('Can not connect to DB.')
+			clear_screen()
+
+	else: 
+		db = DB()
+		db_connected = db.check_is_connected()
+		if db_connected:
+			option_5()
+		else:
+			wait_for_enter()
 	clear_screen()
 
 
 def menu():
 	while(True):
-		print(f"Select your operation:\n1. Passwords characters\n2. Generate password\n3. Show your passwords\n4. Rigix\n5. DB manager\n0. Exit")
+		print("Select your operation:")
+		print("1. Passwords characters")
+		print("2. Generate password")
+		print("3. Show your passwords")
+		print("4. Rigix")
+		print("5. DB manager")
+		print("0. Exit")
+
 		inp = get_number_by_range(0, 5)
 
 		clear_screen()
@@ -137,6 +184,7 @@ def menu():
 			option_4()
 		elif inp == 5:
 			option_5()
+		
 
 def get_number_by_range(a: int, b: int):
 	while True:
@@ -150,11 +198,11 @@ def get_number_by_range(a: int, b: int):
 		else: break
 	return int(num)
 
-def clear_screen(with_press=False):
-	"""Clears the terminal screen."""
-	if with_press:
-		input("Press enter to continue")
+def wait_for_enter():
+	input("Press enter to continue")
 
+def clear_screen():
+	"""Clears the terminal screen."""
     # For Windows
 	if os.name == 'nt':
 		_ = os.system('cls')
@@ -165,7 +213,9 @@ def clear_screen(with_press=False):
 if __name__ == "__main__":
 	session['pass'] = []
 	session['user'] = None
-	print('Do you want to upload your last passwords?\n1. Yes\n0. No')
+	print("Do you want to upload your last passwords?")
+	print("1. Yes")
+	print("0. No")
 	inp = get_number_by_range(0, 1)
 	if inp:
 		session['pass'] = read_temp_file(temp_file_name).split()
