@@ -42,20 +42,16 @@ class DB:
 			username (str):
 			data (list):
 		"""		
-		if self.check_is_connected():
-			if not self.user_exist(username):
-				print("Username does not exist.")
-				return
-			curs = self._conn.cursor()
-			query = f"SELECT {self.data_column_name} FROM {self.table_name} WHERE {self.user_column_name}=%s;"
-			curs.execute(query, (username,))
-			pre_data = curs.fetchone()
-			if pre_data[0]:
-				data += pre_data[0]
-			query = f"UPDATE {self.table_name} SET {self.data_column_name} = %s WHERE {self.user_column_name} = %s;"
-			curs.execute(query, (data, username))
-			self._conn.commit()
-			curs.close()
+		if not self.user_exist(username):
+			print("Username does not exist.")
+			return
+		query = f"SELECT {self.data_column_name} FROM {self.table_name} WHERE {self.user_column_name}=%s;"
+		pre_data = self._sql_exe(query, (username,))
+		if pre_data:
+			data += pre_data[0][0]
+			data = list(set(data))
+		query = f"UPDATE {self.table_name} SET {self.data_column_name} = %s WHERE {self.user_column_name} = %s;"
+		self._sql_exe(query, (data, username))
 
 
 	def get_data(self, username: str):
@@ -67,17 +63,17 @@ class DB:
 		Returns:
 			list: a list of data
 		"""		
-		if self.check_is_connected():
-			if not self.user_exist(username):
-				print("Username does not exist.")
-				return None
-			curs = self._conn.cursor()
-			query = f"SELECT {self.data_column_name} FROM {self.table_name} WHERE {self.user_column_name} = %s"
-			curs.execute(query, (username,))
-			data = curs.fetchone()
-			curs.close()
-			return data[0]
-		return None
+		if not self.user_exist(username):
+			print("Username does not exist.")
+			return None
+		
+		query = f"SELECT {self.data_column_name} FROM {self.table_name} WHERE {self.user_column_name} = %s"
+		data = self._sql_exe(query, (username,), get_result=True)
+
+		if data == None:
+			return None
+		
+		return data[0][0]
 
 	def user_exist(self, username: str):
 		"""Check the given username in database
@@ -88,13 +84,10 @@ class DB:
 		Returns:
 			bool: Return **True** if user name exist else **False**
 		"""		
-		if self.check_is_connected():
-			curs = self._conn.cursor()
-			query = f"SELECT {self.user_column_name} FROM {self.table_name} WHERE {self.user_column_name}=%s;"
-			curs.execute(query, (username,))
-			exist = curs.fetchone()
-			if exist:
-				return True
+		query = f"SELECT {self.user_column_name} FROM {self.table_name} WHERE {self.user_column_name}=%s;"
+		exist = self._sql_exe(query, (username,), get_result=True)
+		if exist:
+			return True
 		return False
 
 	def add_user(self, username: str, password: str):
@@ -108,17 +101,11 @@ class DB:
 		Returns:
 			bool: Return **True** if username can insert to database else **False**
 		"""		
-		if self.check_is_connected():
-			if self.user_exist(username):
-				print("Username already exist!")
-				return False
-			curs = self._conn.cursor()
-			query =  f"INSERT INTO {self.table_name} ({self.user_column_name}, {self.user_pass_column_name}) VALUES (%s, %s);"
-			curs.execute(query, (username, get_hashed_password(password)))
-			self._conn.commit()
-			curs.close()
-			return True
-		return False
+		if self.user_exist(username):
+			return False
+		query =  f"INSERT INTO {self.table_name} ({self.user_column_name}, {self.user_pass_column_name}) VALUES (%s, %s);"
+		self._sql_exe(query, (username, get_hashed_password(password)))
+		return True
 
 	def check_password(self, username: str, password: str):
 		"""Check the given password for username by saved password in database.\n
@@ -130,19 +117,20 @@ class DB:
 		Returns:
 			bool: Return **True** if password was correct else **False**
 		"""		
-		if self.check_is_connected():
-			if not self.user_exist(username):
-				print("Username does not exist.")
-				return False
-			curs = self._conn.cursor()
-			query = f"SELECT {self.user_pass_column_name} FROM {self.table_name} WHERE {self.user_column_name}=%s;"
-			curs.execute(query, (username,))
-			hashed_password = curs.fetchone()[0]
-			cp = check_hashed_password(password, hashed_password)
-			if not cp:
-				print("Password is not True.")
-			return cp
-		return False
+		if not self.user_exist(username):
+			print("Username does not exist.")
+			return False
+		
+		query = f"SELECT {self.user_pass_column_name} FROM {self.table_name} WHERE {self.user_column_name}=%s;"
+		hashed_password = self._sql_exe(query, (username,), get_result= True)[0][0]
+
+		if hashed_password == None:
+			return False
+
+		cp = check_hashed_password(password, hashed_password)
+		if not cp:
+			print("Password is not True.")
+		return cp
 	
 	def close_db(self):
 		"""**Close The Database Connection**\n
@@ -150,3 +138,20 @@ class DB:
 		"""		
 		if self.check_is_connected():
 			self._conn.close()
+
+	def _sql_exe(self, query: str, vars: tuple, get_result=False):
+		res = None
+
+		if self.check_is_connected():
+			curs = self._conn.cursor()
+			curs.execute(query, vars)
+			
+			if get_result:
+				res = curs.fetchall()
+			else:
+				self._conn.commit()
+			curs.close()
+
+		return res
+			
+		

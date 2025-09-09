@@ -107,6 +107,7 @@ def option_5():
 					passwords = db.get_data(session['user'])
 					if passwords:
 						session['pass'] += passwords
+						session['pass'] = list(set(session['pass']))
 					print("Data added to you session")
 				elif inp == 3:
 					session['user'] = None
@@ -139,6 +140,8 @@ def option_5():
 					lr_check = db.add_user(username, lr_pass)
 					if lr_check:
 						print("Username added")
+					else:
+						print("Username already exist!")
 
 				if lr_check:
 					session['user'] = username
