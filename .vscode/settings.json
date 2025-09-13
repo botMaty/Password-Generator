@@ -1,0 +1,38 @@
+{
+    "workbench.iconTheme": "material-icon-theme",
+    "workbench.colorTheme": "Dracula Theme Soft",
+    "python.defaultInterpreterPath": "../library-vscode/bin/python3",
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": "explicit"
+    },
+    "[python]": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "ms-python.autopep8",
+    },
+    "python.linting.pep8": true,
+    "python.linting.pylint": true,
+    "python.linting.flake8": false,
+    "python.linting.enabled": true,
+    "python.formatting.provider": "black",
+    "python.formatting.blackArgs": [
+        "--line-length=120"
+    ],    
+    "python.linting.flake8Args": [
+        "--max-line-length=120",
+        "--ignore=E402,F841,F401,E302,E305",
+    ],
+    "python.linting.pycodestyleArgs": [
+        "--max-line-length=100"
+    ],
+    "python.linting.pylintArgs": [
+        "--max-line-length=180"
+    ],
+    "python.formatting.autopep8Args": [
+        "--max-line-length=180"
+    ],
+    "python.linting.pydocstyleArgs": [
+        "--ignore=D103,D203,D202,D212,D213",
+    ],
+    "python.pythonPath": ".venv/bin/python",
+    "sourcery.token": "user_NlBZTdf1o0qF8zogiKuoe88ZynjUONiOoZiQlHGhwjaOZGkZG8FNjbumSUU",
+}

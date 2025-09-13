@@ -1,0 +1,24 @@
+{
+    "recommendations": [
+        "albert.TabOut",
+        // "donjayamanne.githistory",
+        "eamodio.gitlens",
+        "KevinRose.vsc-python-indent",
+        "mgesbert.python-path",
+        // "mhutchie.git-graph",
+        "ms-azuretools.vscode-docker",
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-toolsai.jupyter",
+        "ms-toolsai.jupyter-keymap",
+        "ms-toolsai.jupyter-renderers",
+        "natqe.reload",
+        "njpwerner.autodocstring",
+        "PKief.material-icon-theme",
+        "tushortz.python-extended-snippets",
+        "waderyan.gitblame",
+        "zhuangtongfa.material-theme",
+        "Redis.redis-for-vscode",
+        "dracula-theme.theme-dracula",
+    ]
+}
